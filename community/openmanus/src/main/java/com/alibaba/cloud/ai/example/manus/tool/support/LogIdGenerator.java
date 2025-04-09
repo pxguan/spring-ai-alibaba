@@ -1,12 +1,12 @@
-/*
- * Copyright 2025 the original author or authors.
- *
+/**
+ * Copyright (C) 2025 AIDC-AI
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,15 +16,17 @@
 
 package com.alibaba.cloud.ai.example.manus.tool.support;
 
-import cn.hutool.core.util.ByteUtil;
-import com.google.common.net.InetAddresses;
-import org.apache.commons.lang3.StringUtils;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.net.InetAddresses;
+
+import cn.hutool.core.util.ByteUtil;
 
 public class LogIdGenerator {
 

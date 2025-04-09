@@ -22,6 +22,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -157,15 +158,13 @@ public class LlmService {
 
 			BrowserUseTool: Open, browse, and use web browsers.If you open a local HTML file, you must provide the absolute path to the file.
 
-			GoogleSearch: Perform web information retrieval
-
-			Summary: Record the result summary of the task.
+			Terminate : Record  the result summary of the task , then terminate the task.
 
 			DocLoader: List all the files in a directory or get the content of a local file at a specified path. Use this tool when you want to get some related information at a directory or file asked by the user.
 
 			Based on user needs, proactively select the most appropriate tool or combination of tools. For complex tasks, you can break down the problem and use different tools step by step to solve it. After using each tool, clearly explain the execution results and suggest the next steps.
 
-			When you are done with the task, you can finalize the plan by summarizing the steps taken and the output of each step, call Summary tool to record the result.
+			When you are done with the task, you can finalize the plan by summarizing the steps taken and the output of each step, call Terminate tool to record the result.
 
 			""";
 
@@ -183,29 +182,28 @@ public class LlmService {
 
 	private final ChatModel chatModel;
 
-	public LlmService(ChatModel chatModel) {
+	public LlmService(ChatModel chatModel, ToolCallbackProvider toolCallbackProvider) {
 		this.chatModel = chatModel;
 
 		this.planningChatClient = ChatClient.builder(chatModel)
 			.defaultSystem(PLANNING_SYSTEM_PROMPT)
 			.defaultAdvisors(new MessageChatMemoryAdvisor(planningMemory))
 			.defaultAdvisors(new SimpleLoggerAdvisor())
-			.defaultTools(ToolBuilder.getPlanningAgentToolCallbacks())
+			.defaultTools(toolCallbackProvider)
 			.build();
 
 		this.chatClient = ChatClient.builder(chatModel)
-			.defaultSystem(MANUS_SYSTEM_PROMPT)
 			.defaultAdvisors(new MessageChatMemoryAdvisor(memory))
 			.defaultAdvisors(new SimpleLoggerAdvisor())
-			.defaultTools(ToolBuilder.getManusAgentToolCalls())
+			.defaultTools(toolCallbackProvider)
 			.defaultOptions(OpenAiChatOptions.builder().internalToolExecutionEnabled(false).build())
 			.build();
 
 		this.finalizeChatClient = ChatClient.builder(chatModel)
-			.defaultSystem(FINALIZE_SYSTEM_PROMPT)
-			.defaultAdvisors(new MessageChatMemoryAdvisor(finalizeMemory))
+			.defaultAdvisors(new MessageChatMemoryAdvisor(memory))
 			.defaultAdvisors(new SimpleLoggerAdvisor())
 			.build();
+
 	}
 
 	public ChatClient getChatClient() {
